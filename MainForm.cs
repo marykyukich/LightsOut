@@ -17,31 +17,18 @@ namespace LightsOut
         private const int NumCells = 3;
         private const int CellLength = GridLength / NumCells;
 
-        private bool[,] grid;
-        private Random rand;
+        private LightsOutGame lightsOutGame;
 
         public MainForm()
         {
             InitializeComponent();
 
-            rand = new Random();
-            grid = new bool[NumCells, NumCells];
-
-            for (int r = 0; r < NumCells; r++)
-                for (int c = 0; c < NumCells; c++)
-                    grid[r, c] = true;
+            lightsOutGame = new LightsOutGame();
         }
 
         private bool PlayerWon()
         {
-            bool won = true;
-
-            for (int r = 0; r < NumCells; r++)
-                for (int c = 0; c < NumCells; c++)
-                    if (grid[r, c])
-                        won = false;
-
-            return won;
+            return lightsOutGame.IsGameOver();
         }
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
@@ -55,7 +42,7 @@ namespace LightsOut
                     Brush brush;
                     Pen pen;
 
-                    if (grid[r,c])
+                    if (lightsOutGame.GetGridValue(r,c))
                     {
                         pen = Pens.Black;
                         brush = Brushes.White;
@@ -83,10 +70,7 @@ namespace LightsOut
             int r = (e.Y - GridOffset) / CellLength;
             int c = (e.X - GridOffset) / CellLength;
 
-            for (int i = r - 1; i <= r + 1; i++)
-                for (int j = c - 1; j <= c + 1; j++)
-                    if (i >= 0 && i < NumCells && j >= 0 && j < NumCells)
-                        grid[i, j] = !grid[i, j];
+            lightsOutGame.Move(r, c);
 
             this.Invalidate();
 
@@ -99,9 +83,7 @@ namespace LightsOut
 
         private void newGameButton_Click(object sender, EventArgs e)
         {
-            for (int r = 0; r < NumCells; r++)
-                for (int c = 0; c < NumCells; c++)
-                    grid[r, c] = rand.Next(2) == 1;
+            lightsOutGame.NewGame();
 
             this.Invalidate();
         }
